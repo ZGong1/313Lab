@@ -15,10 +15,13 @@ public:
 
     Shape (int _vertices) {
         vertices = _vertices;
-        points = new Point*[vertices+1];
+        points = new Point*[vertices + 1];
     }
 
-    ~Shape () {
+    ~Shape() {
+        for (int i = 0; i < vertices; i++) {
+            delete points[i];
+        }
         delete[] points;
     }
 
@@ -31,15 +34,15 @@ public:
 
     double* area () {
         int temp = 0;
-        for (int i = 0; i <= vertices; i++) {
+        for (int i = 0; i < vertices; i++) {
             // FIXME: there are two methods to access members of pointers
             //        use one to fix lhs and the other to fix rhs
-            int lhs = points[i]->x * points[i+1]->y;
-            int rhs = points[i+1]->x * points[i]->y; // FIX THIS TO DO THE "SECOND" WAY
+            int lhs = points[i]->x * points[(i+1) % vertices]->y;
+            int rhs = (*points[(i+1) % vertices]).x * (*points[i]).y;
             temp += (lhs - rhs);
         }
         double area = abs(temp)/2.0;
-        return &area;
+        return new double(area);
     }
 };
 
@@ -72,6 +75,13 @@ int main () {
     quad->addPoints(quadPts);
 
     // FIXME: print out area of tri and area of quad
-    std::cout << "tri->area(): " << tri->area() << std::endl;
-    std::cout << "quad->area(): " << quad->area() << std::endl; 
+    double* triArea = tri->area();
+    double* quadArea = quad->area();
+    std::cout << "tri->area(): " << *triArea << std::endl;
+    std::cout << "quad->area(): " << *quadArea << std::endl;
+
+    delete tri;
+    delete quad;
+    delete triArea;
+    delete quadArea;
 }
